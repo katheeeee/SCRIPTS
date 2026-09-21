@@ -1,0 +1,111 @@
+#!/bin/bash
+
+clear
+
+echo "===================================================="
+echo "        MONITOREO DEL SISTEMA OPERATIVO"
+echo "                     KALI LINUX"
+echo "===================================================="
+echo
+
+echo "================ SISTEMA ==========================="
+
+echo "Sistema operativo:"
+grep '^PRETTY_NAME=' /etc/os-release | cut -d '"' -f2
+
+echo "Kernel:"
+uname -r
+
+echo "Arquitectura:"
+uname -m
+
+echo "Tiempo de actividad:"
+uptime -p
+
+echo "Carga promedio:"
+uptime | awk -F'load average:' '{print $2}'
+
+echo
+
+echo "================ CPU ==============================="
+
+echo "Modelo:"
+lscpu | grep "Model name" | cut -d ':' -f2 | sed 's/^ *//'
+
+echo "Nucleos:"
+nproc
+
+echo "Uso actual de CPU:"
+top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8 "%"}'
+
+echo
+
+echo "================ MEMORIA RAM ======================="
+
+free -h
+
+echo
+
+echo "================ SWAP =============================="
+
+free -h | grep Swap
+
+echo
+
+echo "================ DISCO ============================="
+
+df -h /
+
+echo
+
+echo "================ GPU ==============================="
+
+if command -v lspci >/dev/null 2>&1; then
+    lspci | grep -Ei "VGA|3D|Display"
+else
+    echo "lspci no esta disponible."
+fi
+
+echo
+
+echo "================ PROCESOS =========================="
+
+echo "Cantidad de procesos:"
+ps -e --no-headers | wc -l
+
+echo
+
+echo "Procesos con mayor consumo de CPU:"
+ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -11
+
+echo
+
+echo "Procesos con mayor consumo de RAM:"
+ps -eo pid,comm,%cpu,%mem --sort=-%mem | head -11
+
+echo
+
+echo "================ RED ==============================="
+
+echo "Interfaces de red:"
+ip -br addr
+
+echo
+
+echo "================ USUARIO ==========================="
+
+echo "Usuario actual:"
+whoami
+
+echo
+
+echo "================ RESUMEN ==========================="
+
+echo "Tiempo de actividad:"
+uptime -p
+
+echo
+
+echo "===================================================="
+echo "             MONITOREO FINALIZADO"
+echo "===================================================="
